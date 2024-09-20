@@ -1,0 +1,84 @@
+<section class="content">
+  <div class="dragger">
+    <h2>Table example with drag and drop</h2>
+
+    <div
+      cdkDropList
+      cdkDropListOrientation="horizontal"
+      class="header__grouped"
+      (cdkDropListDropped)="dragAndSortGroupedHeaders($event)"
+      data-id="headerGrouped"
+    >
+      <div
+        class="header__grouped-item"
+        *ngFor="let col of groupedHeaders"
+        cdkDrag
+        data-is-sorting="true"
+        [attr.data-column]="col"
+      >
+        {{ col }}
+
+        <mat-icon
+          class="header-grouped-del"
+          aria-hidden="false"
+          aria-label="delete"
+          fontIcon="delete"
+          (click)="removeFromGroup(col)"
+        ></mat-icon>
+      </div>
+    </div>
+
+    <mat-table
+      class="table"
+      [dataSource]="dataSource"
+      cdkDropList
+      cdkDropListOrientation="horizontal"
+      (cdkDropListDropped)="dragAndGroupHeaders($event)"
+    >
+      <ng-container *ngFor="let col of headers" [matColumnDef]="col">
+        <mat-header-cell
+          class="table__header-item"
+          *matHeaderCellDef
+          cdkDrag
+          data-is-header="true"
+          [attr.data-column]="col"
+          data-section="dragArea"
+        >
+          {{ col }}
+        </mat-header-cell>
+        <mat-cell
+          class="table__cell"
+          *matCellDef="let item"
+          data-section="dragArea"
+        >
+          {{ item[col] }}
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row
+        class="table__header"
+        *matHeaderRowDef="headers"
+        data-section="dragArea"
+      ></mat-header-row>
+      <mat-row *matRowDef="let row; columns: headers"></mat-row>
+
+      <ng-container matColumnDef="groupHeader">
+        <mat-cell class="table__cell" colspan="999" *matCellDef="let group">
+          <span [style.margin-left.px]="(group.level - 1) * 16"></span>
+          <mat-icon *ngIf="group.expanded">expand_less</mat-icon>
+          <mat-icon *ngIf="!group.expanded">expand_more</mat-icon>
+          <strong
+            >{{ groupedHeaders[group.level - 1] }} =
+            {{ group[groupedHeaders[group.level - 1]] }} ({{
+              group.totalCounts
+            }})</strong
+          >
+        </mat-cell>
+      </ng-container>
+      <mat-row
+        *matRowDef="let row; columns: ['groupHeader']; when: isGrouped"
+        (click)="collapseExpandRow(row)"
+      ></mat-row>
+    </mat-table>
+  </div>
+</section>
